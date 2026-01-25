@@ -5,3 +5,8 @@ description = "BP Order Management"
 readme = "README.md"
 requires-python = ">=3.14"
 dependencies = []
+
+[dependency-groups]
+dev = [
+    "pyinstaller>=6.18.0",
+]
