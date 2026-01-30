@@ -36,10 +36,10 @@ jobs:
         run: uv sync
 
       - name: Build executable
-        run: uv run pyinstaller --noconfirm "BP Order Management.spec"
+        run: uv run pyinstaller --noconfirm BP-Order-Management.spec
 
       - name: Upload artifact to release
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            dist/BP Order Management*
+            dist/BP-Order-Management*

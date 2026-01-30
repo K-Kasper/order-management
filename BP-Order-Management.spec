@@ -22,7 +22,7 @@ exe = EXE(
     a.binaries,
     a.datas,
     [],
-    name='BP Order Management',
+    name='BP-Order-Management',
     debug=False,
     bootloader_ignore_signals=False,
     strip=True,
