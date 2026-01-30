@@ -1,12 +1,12 @@
 # -*- mode: python ; coding: utf-8 -*-
 
-from PyInstaller.utils.hooks import collect_metadata
+from PyInstaller.utils.hooks import copy_metadata
 
 a = Analysis(
     ['src/order_management/app.py'],
     pathex=['src'],
     binaries=[],
-    datas=[('src/order_management/assets', 'order_management/assets')],
+    datas=[('src/order_management/assets', 'order_management/assets')] + copy_metadata('bp-order-management'),
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},
@@ -15,7 +15,6 @@ a = Analysis(
     noarchive=False,
     optimize=2,
 )
-a.datas += collect_metadata('bp-order-management')
 
 pyz = PYZ(a.pure)
 
