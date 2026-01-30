@@ -1,5 +1,6 @@
 # -*- mode: python ; coding: utf-8 -*-
 
+from PyInstaller.utils.hooks import collect_metadata
 
 a = Analysis(
     ['src/order_management/app.py'],
@@ -14,6 +15,8 @@ a = Analysis(
     noarchive=False,
     optimize=2,
 )
+a.datas += collect_metadata('bp-order-management')
+
 pyz = PYZ(a.pure)
 
 exe = EXE(

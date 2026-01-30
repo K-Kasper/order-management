@@ -14,6 +14,7 @@ from order_management.ui.tabs import (
     OrdersTabController,
     ReportsTabController,
 )
+from order_management.version import get_version
 
 
 class MainWindow(tk.Tk):
@@ -173,6 +174,16 @@ class MainWindow(tk.Tk):
 
         self._status_left = ttk.Label(status, text="Ready", anchor="w")
         self._status_left.pack(side="left", fill="x", expand=True)
+
+        app_version = get_version()
+        if app_version:
+            version_text = f"v{app_version}"
+            self._status_right = ttk.Label(
+                status,
+                text=version_text,
+                anchor="e",
+            )
+            self._status_right.pack(side="right", padx=(12, 0))
 
     def _set_status(self, message: str) -> None:
         """Set the status bar message."""
