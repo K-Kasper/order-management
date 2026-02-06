@@ -112,16 +112,13 @@ class OrderService:
         except OSError:
             pass
 
-    def export_order_form(self, order_id: int) -> Path:
+    def export_order_form(self, order_id: int, output_path: Path) -> Path:
         """Export an order as a PDF service order form."""
         order = self._repo.get_order(order_id)
         if not order:
             raise ValueError("Order not found")
         images = self._repo.list_images(order_id)
-        export_dir = self._export_dir()
-        export_dir.mkdir(parents=True, exist_ok=True)
-        filename = f"{order['order_no']}_service_order.pdf"
-        output_path = export_dir / filename
+        output_path.parent.mkdir(parents=True, exist_ok=True)
         pdf_bytes = self._pdf_service.render_order_form(order, images)
         output_path.write_bytes(pdf_bytes)
         return output_path
@@ -143,22 +140,22 @@ class OrderService:
             today.strftime("%Y-%m-%d"), through.strftime("%Y-%m-%d")
         )
 
-    def export_reports(self, days: int = 7) -> Path:
+    def export_reports(self, output_path: Path, days: int = 7) -> Path:
         """Export operational reports as PDF."""
         summary = self.status_summary()
         overdue = self.overdue_orders()
         due_soon = self.due_soon_orders(days=days)
-        export_dir = self._export_dir()
-        export_dir.mkdir(parents=True, exist_ok=True)
-        timestamp = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
-        output_path = export_dir / f"reports_{timestamp}.pdf"
+        output_path.parent.mkdir(parents=True, exist_ok=True)
         pdf_bytes = self._pdf_service.render_reports(summary, overdue, due_soon, days)
         output_path.write_bytes(pdf_bytes)
         return output_path
 
-    def _export_dir(self) -> Path:
-        """Get the export directory path."""
-        return Path.home() / "Downloads" / "bp-order-management"
+    def suggested_order_filename(self, order_id: int) -> str:
+        """Return a suggested filename for an order export."""
+        order = self._repo.get_order(order_id)
+        if not order:
+            raise ValueError("Order not found")
+        return f"{order['order_no']}_service_order.pdf"
 
     def _next_order_no(self) -> str:
         """Generate the next order number."""

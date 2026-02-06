@@ -43,18 +43,12 @@ def open_path(path: Path) -> bool:
     return False
 
 
-def get_exports_folder() -> Path:
-    """Get the default exports folder path."""
-    return Path.home() / "Downloads" / "bp-order-management"
-
-
-def open_exports_folder() -> bool:
-    """Open the exports folder if it exists.
+def open_folder(folder: Path) -> bool:
+    """Open the given folder if it exists.
 
     Returns:
         True if the folder was opened, False otherwise.
     """
-    exports_dir = get_exports_folder()
-    if not exports_dir.exists():
+    if not folder.exists():
         return False
-    return open_path(exports_dir)
+    return open_path(folder)
