@@ -151,8 +151,10 @@ class OrdersTabController:
             "priority",
             "updated_at",
         )
+        tree_frame = ttk.Frame(list_frame)
+        tree_frame.pack(fill="both", expand=True, padx=4, pady=4)
         self._orders_tree = ttk.Treeview(
-            list_frame, columns=columns, show="headings", height=10
+            tree_frame, columns=columns, show="headings", height=3
         )
         headings = {
             "order_no": "Order",
@@ -176,13 +178,19 @@ class OrdersTabController:
         self._orders_tree.column("title", width=200)
         self._orders_tree.column("customer_display", width=180)
         configure_treeview_tags(self._orders_tree)
-        self._orders_tree.pack(fill="both", expand=True, padx=4, pady=4)
+        orders_scrollbar = ttk.Scrollbar(
+            tree_frame, orient="vertical", command=self._orders_tree.yview
+        )
+        self._orders_tree.configure(yscrollcommand=orders_scrollbar.set)
+        self._orders_tree.pack(side="left", fill="both", expand=True)
+        orders_scrollbar.pack(side="right", fill="y")
         self._orders_tree.bind("<<TreeviewSelect>>", self._on_select_order)
 
     def _build_detail_form(self, parent: ttk.Frame) -> None:
         """Build the order detail form section."""
-        detail_frame = ttk.LabelFrame(parent, text="Order Detail")
-        detail_frame.pack(fill="x", pady=(4, 4))
+        self._detail_frame = ttk.LabelFrame(parent, text="Order Detail")
+        self._detail_frame.pack(fill="x", pady=(4, 4))
+        detail_frame = self._detail_frame
 
         form = ttk.Frame(detail_frame, padding=(self._layout["section_padx"], 4))
         form.pack(fill="x")
@@ -196,29 +204,32 @@ class OrdersTabController:
         self._priority = tk.StringVar(value=PRIORITY_OPTIONS[1])
 
         labels = [
-            ("Order No", 0, 0),
-            ("Title", 0, 2),
-            ("Customer", 1, 0),
+            ("Title", 0, 0),
+            ("Customer", 0, 2),
+            ("Deadline (DD/MM/YYYY)", 1, 0),
             ("Status", 1, 2),
-            ("Deadline (DD/MM/YYYY)", 2, 0),
+            ("Priority", 2, 0),
             ("Value", 2, 2),
-            ("Priority", 3, 0),
         ]
         for text, row, col in labels:
             ttk.Label(form, text=text + ":", width=18, anchor="e").grid(
                 row=row, column=col, sticky="e", padx=3, pady=2
             )
 
-        ttk.Entry(form, textvariable=self._order_no, width=18, state="readonly").grid(
-            row=0, column=1, sticky="w", padx=3, pady=2
-        )
         ttk.Entry(form, textvariable=self._title, width=32).grid(
-            row=0, column=3, sticky="w", padx=3, pady=2
+            row=0, column=1, sticky="w", padx=3, pady=2
         )
         self._customer_combo = ttk.Combobox(
             form, textvariable=self._customer, values=(), width=30, state="readonly"
         )
-        self._customer_combo.grid(row=1, column=1, sticky="w", padx=3, pady=2)
+        self._customer_combo.grid(row=0, column=3, sticky="w", padx=3, pady=2)
+        self._deadline_entry = DateEntry(
+            form,
+            textvariable=self._deadline,
+            width=18,
+            date_pattern="dd/mm/yyyy",
+        )
+        self._deadline_entry.grid(row=1, column=1, sticky="w", padx=3, pady=2)
         ttk.Combobox(
             form,
             textvariable=self._status,
@@ -226,35 +237,40 @@ class OrdersTabController:
             width=18,
             state="readonly",
         ).grid(row=1, column=3, sticky="w", padx=3, pady=2)
-        self._deadline_entry = DateEntry(
-            form,
-            textvariable=self._deadline,
-            width=18,
-            date_pattern="dd/mm/yyyy",
-        )
-        self._deadline_entry.grid(row=2, column=1, sticky="w", padx=3, pady=2)
-        ttk.Entry(form, textvariable=self._value, width=18).grid(
-            row=2, column=3, sticky="w", padx=3, pady=2
-        )
         ttk.Combobox(
             form,
             textvariable=self._priority,
             values=PRIORITY_OPTIONS,
             width=18,
             state="readonly",
-        ).grid(row=3, column=1, sticky="w", padx=3, pady=2)
+        ).grid(row=2, column=1, sticky="w", padx=3, pady=2)
+        ttk.Entry(form, textvariable=self._value, width=18).grid(
+            row=2, column=3, sticky="w", padx=3, pady=2
+        )
 
         desc_frame = ttk.LabelFrame(detail_frame, text="Description / Brief")
         desc_frame.pack(fill="both", padx=6, pady=(0, 6))
-        self._description = tk.Text(desc_frame, height=5, wrap="word")
-        self._description.pack(fill="both", expand=True, padx=6, pady=4)
+        desc_body = ttk.Frame(desc_frame)
+        desc_body.pack(fill="both", expand=True, padx=6, pady=4)
+        self._description = tk.Text(desc_body, height=3, wrap="word")
+        desc_scrollbar = ttk.Scrollbar(
+            desc_body, orient="vertical", command=self._description.yview
+        )
+        self._description.configure(yscrollcommand=desc_scrollbar.set)
+        self._description.pack(side="left", fill="both", expand=True)
+        desc_scrollbar.pack(side="right", fill="y")
 
         images_frame = ttk.LabelFrame(detail_frame, text="Reference Images")
         images_frame.pack(fill="both", padx=6, pady=(0, 6))
         images_body = ttk.Frame(images_frame, padding=4)
         images_body.pack(fill="x")
-        self._images_list = tk.Listbox(images_body, height=4)
+        self._images_list = tk.Listbox(images_body, height=3)
+        images_scrollbar = ttk.Scrollbar(
+            images_body, orient="vertical", command=self._images_list.yview
+        )
+        self._images_list.configure(yscrollcommand=images_scrollbar.set)
         self._images_list.pack(side="left", fill="x", expand=True)
+        images_scrollbar.pack(side="right", fill="y")
         self._images_list.bind("<Double-Button-1>", self._view_image_event)
 
         actions = ButtonBar(
@@ -396,7 +412,7 @@ class OrdersTabController:
         if not order:
             return
         self._current_order_id = order_id
-        self._order_no.set(order.get("order_no", ""))
+        self._set_order_no(order.get("order_no", ""))
         self._title.set(order.get("title", ""))
         customer_display = (
             order.get("customer_display") or order.get("customer_name") or ""
@@ -418,6 +434,14 @@ class OrdersTabController:
         for image in self._images_cache:
             self._images_list.insert("end", image.get("file_name"))
 
+    def _set_order_no(self, value: str) -> None:
+        """Set the order number and update the detail frame title."""
+        self._order_no.set(value)
+        if value and value != "(new)":
+            self._detail_frame.configure(text=f"Order Detail \u2014 {value}")
+        else:
+            self._detail_frame.configure(text="Order Detail")
+
     def _set_deadline_display(self, value: str) -> None:
         """Set the deadline entry display value."""
         if not value:
@@ -438,7 +462,7 @@ class OrdersTabController:
     def new_order(self) -> None:
         """Clear form for a new order."""
         self._current_order_id = None
-        self._order_no.set("(new)")
+        self._set_order_no("(new)")
         self._title.set("")
         self._customer.set("")
         self._status.set(STATUS_OPTIONS[0])
@@ -460,7 +484,7 @@ class OrdersTabController:
             self._current_order_id = order_id
             order = self._order_service.get_order(order_id)
             if order:
-                self._order_no.set(order.get("order_no", ""))
+                self._set_order_no(order.get("order_no", ""))
             self._set_status("Order created")
         else:
             self._order_service.update_order(self._current_order_id, payload)

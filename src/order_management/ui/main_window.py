@@ -25,7 +25,7 @@ class MainWindow(tk.Tk):
         self._layout = DEFAULT_LAYOUT.copy()
         self._configure_fonts()
         self.title("BP Order Management")
-        self.minsize(1120, 720)
+        self.minsize(1120, 480)
         self.configure(bg=BG_MAIN)
 
         self._order_service = OrderService()
@@ -37,8 +37,8 @@ class MainWindow(tk.Tk):
         self.iconphoto(True, self._logo_image)
 
         self._build_menu()
-        self._build_main_content()
         self._build_statusbar()
+        self._build_main_content()
 
         self.protocol("WM_DELETE_WINDOW", self._on_close)
 

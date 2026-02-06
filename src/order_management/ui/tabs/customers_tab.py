@@ -54,8 +54,10 @@ class CustomersTabController:
         )
 
         columns = ("name", "contact_name", "email", "phone", "updated_at")
+        tree_frame = ttk.Frame(list_frame)
+        tree_frame.pack(fill="both", expand=True, padx=4, pady=4)
         self._customers_tree = ttk.Treeview(
-            list_frame, columns=columns, show="headings", height=10
+            tree_frame, columns=columns, show="headings", height=8
         )
         headings = {
             "name": "Name",
@@ -72,7 +74,12 @@ class CustomersTabController:
             if col == "updated_at":
                 width = 140
             self._customers_tree.column(col, width=width, anchor="w")
-        self._customers_tree.pack(fill="both", expand=True, padx=4, pady=4)
+        customers_scrollbar = ttk.Scrollbar(
+            tree_frame, orient="vertical", command=self._customers_tree.yview
+        )
+        self._customers_tree.configure(yscrollcommand=customers_scrollbar.set)
+        self._customers_tree.pack(side="left", fill="both", expand=True)
+        customers_scrollbar.pack(side="right", fill="y")
         self._customers_tree.bind("<<TreeviewSelect>>", self._on_select_customer)
 
     def _build_detail_form(self, parent: ttk.Frame) -> None:
