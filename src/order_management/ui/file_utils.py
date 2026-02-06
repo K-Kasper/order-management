@@ -18,7 +18,10 @@ def open_path(path: Path) -> bool:
     """
     try:
         if sys.platform.startswith("win"):
-            os.startfile(str(path))
+            if path.is_dir():
+                subprocess.Popen(["explorer", str(path.resolve())])
+            else:
+                os.startfile(str(path))
             return True
         if sys.platform == "darwin":
             subprocess.Popen(["open", str(path)], start_new_session=True)
