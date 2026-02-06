@@ -1,7 +1,6 @@
 """Orders tab controller."""
 
 import tkinter as tk
-import webbrowser
 from pathlib import Path
 from tkinter import filedialog, messagebox, ttk
 from typing import Any, Callable
@@ -597,9 +596,7 @@ class OrdersTabController:
         if not file_path.exists():
             messagebox.showerror("View Image", "Image file not found on disk.")
             return
-        try:
-            webbrowser.open(file_path.resolve().as_uri())
-        except OSError:
+        if not open_path(file_path):
             messagebox.showerror("View Image", "Unable to open the image file.")
 
     def _export_form(self) -> None:
