@@ -1,10 +1,13 @@
 """Reports tab controller."""
 
-from tkinter import messagebox, ttk
+from datetime import datetime
+from pathlib import Path
+from tkinter import filedialog, messagebox, ttk
 from typing import Any, Callable
 
+from order_management.data.settings import get_setting, set_setting
 from order_management.services.order_service import OrderService
-from order_management.ui.file_utils import open_exports_folder, open_path
+from order_management.ui.file_utils import open_folder, open_path
 from order_management.ui.widgets import ButtonBar, clear_treeview, configure_treeview_tags
 from order_management.utils import format_date
 
@@ -175,13 +178,39 @@ class ReportsTabController:
             )
             self._due_soon_tree.item(item_id, tags=("due_soon",))
 
+    def _default_export_dir(self) -> str:
+        """Return the best default directory for exports."""
+        saved = get_setting("last_export_dir")
+        if saved and Path(saved).is_dir():
+            return saved
+        downloads = Path.home() / "Downloads"
+        if downloads.is_dir():
+            return str(downloads)
+        return str(Path.home())
+
     def _export_reports(self) -> None:
         """Export reports as PDF."""
-        output_path = self._order_service.export_reports()
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        filename = f"reports_{timestamp}.pdf"
+        chosen = filedialog.asksaveasfilename(
+            defaultextension=".pdf",
+            filetypes=[("PDF files", "*.pdf")],
+            initialdir=self._default_export_dir(),
+            initialfile=filename,
+        )
+        if not chosen:
+            return
+        output_path = Path(chosen)
+        try:
+            self._order_service.export_reports(output_path)
+        except OSError as exc:
+            messagebox.showerror("Export Failed", str(exc))
+            return
+        set_setting("last_export_dir", str(output_path.parent))
         open_path(output_path)
         if messagebox.askyesno(
             "Export Complete",
-            f"Reports saved to:\n{output_path}\n\nOpen the exports folder?",
+            f"Reports saved to:\n{output_path}\n\nOpen the folder?",
         ):
-            open_exports_folder()
+            open_folder(output_path.parent)
         self._set_status("Exported reports")

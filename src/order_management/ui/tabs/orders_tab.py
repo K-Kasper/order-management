@@ -14,7 +14,8 @@ from order_management.services.order_service import (
     OrderService,
 )
 from order_management.ui.constants import IMAGE_FILE_TYPES
-from order_management.ui.file_utils import open_exports_folder, open_path
+from order_management.data.settings import get_setting, set_setting
+from order_management.ui.file_utils import open_folder, open_path
 from order_management.ui.widgets import ButtonBar, clear_treeview, configure_treeview_tags
 from order_management.utils import date_status, format_date, format_datetime, parse_date
 
@@ -623,22 +624,49 @@ class OrdersTabController:
         if not open_path(file_path):
             messagebox.showerror("View Image", "Unable to open the image file.")
 
+    def _default_export_dir(self) -> str:
+        """Return the best default directory for exports."""
+        saved = get_setting("last_export_dir")
+        if saved and Path(saved).is_dir():
+            return saved
+        downloads = Path.home() / "Downloads"
+        if downloads.is_dir():
+            return str(downloads)
+        return str(Path.home())
+
     def _export_form(self) -> None:
         """Export the current order as PDF."""
         if self._current_order_id is None:
             messagebox.showinfo("Export", "Select an order to export.")
             return
         try:
-            output_path = self._order_service.export_order_form(self._current_order_id)
+            filename = self._order_service.suggested_order_filename(
+                self._current_order_id
+            )
         except ValueError as exc:
             messagebox.showerror("Export Failed", str(exc))
             return
+        chosen = filedialog.asksaveasfilename(
+            defaultextension=".pdf",
+            filetypes=[("PDF files", "*.pdf")],
+            initialdir=self._default_export_dir(),
+            initialfile=filename,
+        )
+        if not chosen:
+            return
+        output_path = Path(chosen)
+        try:
+            self._order_service.export_order_form(self._current_order_id, output_path)
+        except (ValueError, OSError) as exc:
+            messagebox.showerror("Export Failed", str(exc))
+            return
+        set_setting("last_export_dir", str(output_path.parent))
         open_path(output_path)
         if messagebox.askyesno(
             "Export Complete",
-            f"Service order form saved to:\n{output_path}\n\nOpen the exports folder?",
+            f"Service order form saved to:\n{output_path}\n\nOpen the folder?",
         ):
-            open_exports_folder()
+            open_folder(output_path.parent)
         self._set_status("Exported service order form")
 
     @property
