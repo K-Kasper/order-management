@@ -1,5 +1,6 @@
 """Customers tab controller."""
 
+import sqlite3
 import tkinter as tk
 from collections.abc import Callable
 from tkinter import messagebox, ttk
@@ -196,13 +197,17 @@ class CustomersTabController:
         payload = self._collect_customer_payload()
         if not payload:
             return
-        if self._current_customer_id is None:
-            customer_id = self._customer_service.create_customer(payload)
-            self._current_customer_id = customer_id
-            self._set_status("Customer created")
-        else:
-            self._customer_service.update_customer(self._current_customer_id, payload)
-            self._set_status("Customer updated")
+        try:
+            if self._current_customer_id is None:
+                customer_id = self._customer_service.create_customer(payload)
+                self._current_customer_id = customer_id
+                self._set_status("Customer created")
+            else:
+                self._customer_service.update_customer(self._current_customer_id, payload)
+                self._set_status("Customer updated")
+        except sqlite3.IntegrityError as exc:
+            self._handle_customer_integrity_error(payload["name"], exc)
+            return
         self.load_customers()
         self._on_data_changed()
         if self._current_customer_id is not None:
@@ -210,6 +215,26 @@ class CustomersTabController:
             if self._customers_tree.exists(item_id):
                 self._customers_tree.selection_set(item_id)
                 self._customers_tree.see(item_id)
+
+    def _handle_customer_integrity_error(
+        self,
+        customer_name: str,
+        exc: sqlite3.IntegrityError,
+    ) -> None:
+        """Show actionable feedback when a customer cannot be saved."""
+        if "customers.name" in str(exc):
+            messagebox.showwarning(
+                "Duplicate Customer",
+                f'A customer named "{customer_name}" already exists. Use a different name.',
+            )
+            self._set_status("Customer name already exists")
+            return
+
+        messagebox.showerror(
+            "Save Customer",
+            "Customer could not be saved. Check the details and try again.",
+        )
+        self._set_status("Customer not saved")
 
     def delete_customer(self) -> None:
         """Delete the selected customer."""
