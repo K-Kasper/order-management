@@ -193,7 +193,7 @@ class OrderRepository:
                     COALESCE(customers.name, orders.customer_name) AS customer_display
                 FROM orders
                 LEFT JOIN customers ON customers.id = orders.customer_id
-                WHERE deadline >= ? AND deadline <= ?
+                WHERE status != 'Closed' AND deadline >= ? AND deadline <= ?
                 ORDER BY deadline ASC
                 """,
                 (today, through),
