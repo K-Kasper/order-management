@@ -1,8 +1,8 @@
 """Action button bar widget."""
 
 import tkinter as tk
+from collections.abc import Callable
 from tkinter import ttk
-from typing import Callable
 
 
 class ButtonBar(ttk.Frame):
@@ -23,6 +23,4 @@ class ButtonBar(ttk.Frame):
         """
         super().__init__(parent, padding=padding)
         for label, command in buttons:
-            ttk.Button(self, text=label, command=command).pack(
-                side="left", padx=(0, 6)
-            )
+            ttk.Button(self, text=label, command=command).pack(side="left", padx=(0, 6))

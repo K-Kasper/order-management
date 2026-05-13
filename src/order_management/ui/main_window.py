@@ -65,9 +65,7 @@ class MainWindow(tk.Tk):
         style = ttk.Style(self)
         style.configure("Toolbar.TFrame", padding=(self._layout["panel_padx"], 4))
         style.configure("Header.TFrame", background=PRIMARY_BLUE)
-        style.configure(
-            "Header.TLabel", background=PRIMARY_BLUE, foreground=HEADER_FOREGROUND
-        )
+        style.configure("Header.TLabel", background=PRIMARY_BLUE, foreground=HEADER_FOREGROUND)
         style.configure("Filter.TLabel", padding=(0, 0, 6, 0))
         style.configure("Action.TButton", padding=(8, 2))
 
@@ -93,9 +91,7 @@ class MainWindow(tk.Tk):
         customer_menu = tk.Menu(menubar, tearoff=False)
         customer_menu.add_command(label="New Customer", command=self._new_customer)
         customer_menu.add_command(label="Save Customer", command=self._save_customer)
-        customer_menu.add_command(
-            label="Delete Customer", command=self._delete_customer
-        )
+        customer_menu.add_command(label="Delete Customer", command=self._delete_customer)
 
         tools_menu = tk.Menu(menubar, tearoff=False)
         tools_menu.add_command(label="Seed Demo Data", command=self._seed_demo_data)
@@ -257,8 +253,7 @@ class MainWindow(tk.Tk):
         self._load_data()
         messagebox.showinfo(
             "Seed Demo Data",
-            f"Created {result.customers_created} customer(s) and "
-            f"{result.orders_created} order(s).",
+            f"Created {result.customers_created} customer(s) and {result.orders_created} order(s).",
         )
 
     def _on_close(self) -> None:

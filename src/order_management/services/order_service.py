@@ -81,9 +81,7 @@ class OrderService:
         """List images for an order."""
         return self._repo.list_images(order_id)
 
-    def add_images(
-        self, order_id: int, source_paths: list[Path]
-    ) -> list[dict[str, Any]]:
+    def add_images(self, order_id: int, source_paths: list[Path]) -> list[dict[str, Any]]:
         """Add images to an order by copying them to the uploads directory."""
         uploads_dir = APP_DIR / "uploads"
         uploads_dir.mkdir(parents=True, exist_ok=True)
@@ -136,9 +134,7 @@ class OrderService:
         """Get orders due within the specified number of days."""
         today = date.today()
         through = today + timedelta(days=days)
-        return self._repo.list_due_soon(
-            today.strftime("%Y-%m-%d"), through.strftime("%Y-%m-%d")
-        )
+        return self._repo.list_due_soon(today.strftime("%Y-%m-%d"), through.strftime("%Y-%m-%d"))
 
     def export_reports(self, output_path: Path, days: int = 7) -> Path:
         """Export operational reports as PDF."""

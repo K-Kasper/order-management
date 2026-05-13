@@ -1,12 +1,14 @@
 """Orders tab controller."""
 
 import tkinter as tk
+from collections.abc import Callable
 from pathlib import Path
 from tkinter import filedialog, messagebox, ttk
-from typing import Any, Callable
+from typing import Any
 
 from tkcalendar import DateEntry
 
+from order_management.data.settings import get_setting, set_setting
 from order_management.services.order_service import (
     PRIORITY_OPTIONS,
     STATUS_OPTIONS,
@@ -14,7 +16,6 @@ from order_management.services.order_service import (
     OrderService,
 )
 from order_management.ui.constants import IMAGE_FILE_TYPES, PDF_FILE_TYPES
-from order_management.data.settings import get_setting, set_setting
 from order_management.ui.file_utils import open_folder, open_path
 from order_management.ui.widgets import ButtonBar, clear_treeview, configure_treeview_tags
 from order_management.utils import date_status, format_date, format_datetime, parse_date
@@ -81,7 +82,7 @@ class OrdersTabController:
         status_combo = ttk.Combobox(
             filter_body,
             textvariable=self._filter_status,
-            values=("",) + STATUS_OPTIONS,
+            values=("", *STATUS_OPTIONS),
             width=12,
             state="readonly",
         )
@@ -106,16 +107,16 @@ class OrdersTabController:
             row=1, column=2, sticky="w", padx=(0, 10)
         )
 
-        ttk.Label(
-            filter_body, text="Deadline From (DD/MM/YYYY)", style="Filter.TLabel"
-        ).grid(row=0, column=3, sticky="w")
+        ttk.Label(filter_body, text="Deadline From (DD/MM/YYYY)", style="Filter.TLabel").grid(
+            row=0, column=3, sticky="w"
+        )
         ttk.Entry(filter_body, textvariable=self._filter_deadline_from, width=16).grid(
             row=1, column=3, sticky="w", padx=(0, 10)
         )
 
-        ttk.Label(
-            filter_body, text="Deadline To (DD/MM/YYYY)", style="Filter.TLabel"
-        ).grid(row=0, column=4, sticky="w")
+        ttk.Label(filter_body, text="Deadline To (DD/MM/YYYY)", style="Filter.TLabel").grid(
+            row=0, column=4, sticky="w"
+        )
         ttk.Entry(filter_body, textvariable=self._filter_deadline_to, width=16).grid(
             row=1, column=4, sticky="w", padx=(0, 10)
         )
@@ -154,9 +155,7 @@ class OrdersTabController:
         )
         tree_frame = ttk.Frame(list_frame)
         tree_frame.pack(fill="both", expand=True, padx=4, pady=4)
-        self._orders_tree = ttk.Treeview(
-            tree_frame, columns=columns, show="headings", height=3
-        )
+        self._orders_tree = ttk.Treeview(tree_frame, columns=columns, show="headings", height=3)
         headings = {
             "order_no": "Order",
             "title": "Title",
@@ -289,9 +288,7 @@ class OrdersTabController:
         )
         actions.pack(fill="x", pady=(0, 6))
 
-    def update_customer_lists(
-        self, names: list[str], customers_by_name: dict[str, int]
-    ) -> None:
+    def update_customer_lists(self, names: list[str], customers_by_name: dict[str, int]) -> None:
         """Update the customer dropdown lists.
 
         Args:
@@ -300,7 +297,7 @@ class OrdersTabController:
         """
         self._customers_by_name = customers_by_name
         self._customer_combo.configure(values=names)
-        self._filter_customer_combo.configure(values=("",) + tuple(names))
+        self._filter_customer_combo.configure(values=("", *tuple(names)))
 
     def load_orders(self) -> None:
         """Load orders with current filters."""
@@ -415,9 +412,7 @@ class OrdersTabController:
         self._current_order_id = order_id
         self._set_order_no(order.get("order_no", ""))
         self._title.set(order.get("title", ""))
-        customer_display = (
-            order.get("customer_display") or order.get("customer_name") or ""
-        )
+        customer_display = order.get("customer_display") or order.get("customer_name") or ""
         self._customer.set(customer_display)
         self._status.set(order.get("status", STATUS_OPTIONS[0]))
         self._set_deadline_display(format_date(order.get("deadline")))
@@ -450,7 +445,9 @@ class OrdersTabController:
             self._deadline_entry.delete(0, "end")
             return
         from datetime import datetime
+
         from order_management.utils import DATE_DISPLAY, DATE_STORAGE
+
         for fmt in (DATE_DISPLAY, DATE_STORAGE):
             try:
                 parsed = datetime.strptime(value, fmt)
@@ -541,9 +538,7 @@ class OrdersTabController:
             )
             return None
         if not description:
-            messagebox.showwarning(
-                "Missing Description", "Description/brief is required."
-            )
+            messagebox.showwarning("Missing Description", "Description/brief is required.")
             return None
         deadline = parse_date(deadline_raw)
         if not deadline:
@@ -640,9 +635,7 @@ class OrdersTabController:
             messagebox.showinfo("Export", "Select an order to export.")
             return
         try:
-            filename = self._order_service.suggested_order_filename(
-                self._current_order_id
-            )
+            filename = self._order_service.suggested_order_filename(self._current_order_id)
         except ValueError as exc:
             messagebox.showerror("Export Failed", str(exc))
             return

@@ -1,15 +1,16 @@
 """Reports tab controller."""
 
+from collections.abc import Callable
 from datetime import datetime
 from pathlib import Path
 from tkinter import filedialog, messagebox, ttk
-from typing import Any, Callable
+from typing import Any
 
 from order_management.data.settings import get_setting, set_setting
 from order_management.services.order_service import OrderService
 from order_management.ui.constants import PDF_FILE_TYPES, TAG_COLORS
 from order_management.ui.file_utils import open_folder, open_path
-from order_management.ui.widgets import ButtonBar, clear_treeview, configure_treeview_tags
+from order_management.ui.widgets import ButtonBar, clear_treeview
 from order_management.utils import format_date
 
 
@@ -102,9 +103,7 @@ class ReportsTabController:
             self._due_soon_tree.heading(col, text=text)
             self._due_soon_tree.column(col, width=width, anchor="w")
         self._due_soon_tree.column("value", anchor="e")
-        self._due_soon_tree.tag_configure(
-            "due_soon", background=TAG_COLORS["due_soon"]
-        )
+        self._due_soon_tree.tag_configure("due_soon", background=TAG_COLORS["due_soon"])
         self._due_soon_tree.pack(fill="both", expand=True, padx=4, pady=4)
 
         # Actions

@@ -22,9 +22,7 @@ class PdfService:
             logo_path = Path(__file__).resolve().parents[1] / "assets" / "bp-logo.png"
         self._logo_path = logo_path
 
-    def render_order_form(
-        self, order: dict[str, Any], images: list[dict[str, Any]]
-    ) -> bytes:
+    def render_order_form(self, order: dict[str, Any], images: list[dict[str, Any]]) -> bytes:
         """Render a service order form as PDF.
 
         Args:
@@ -175,9 +173,7 @@ class PdfService:
 
         return self._output_pdf(pdf)
 
-    def _render_image_pages(
-        self, pdf: FPDF, images: list[dict[str, Any]]
-    ) -> None:
+    def _render_image_pages(self, pdf: FPDF, images: list[dict[str, Any]]) -> None:
         """Render image gallery pages."""
         pdf.add_page()
         pdf.set_font("Helvetica", "B", 12)
@@ -205,37 +201,37 @@ class PdfService:
                 pdf.multi_cell(0, 5, "Unsupported image", border=1)
             pdf.ln(3)
 
-    def _build_summary_rows(
-        self, summary: list[dict[str, Any]]
-    ) -> list[list[str]]:
+    def _build_summary_rows(self, summary: list[dict[str, Any]]) -> list[list[str]]:
         """Build summary table rows."""
         rows: list[list[str]] = []
         for row in summary:
             total_value = float(row.get("total_value") or 0.0)
-            rows.append([
-                str(row.get("status", "")),
-                str(row.get("order_count", 0)),
-                f"${total_value:,.2f}",
-            ])
+            rows.append(
+                [
+                    str(row.get("status", "")),
+                    str(row.get("order_count", 0)),
+                    f"${total_value:,.2f}",
+                ]
+            )
         return rows or [["No data", "", ""]]
 
-    def _build_order_rows(
-        self, orders: list[dict[str, Any]]
-    ) -> list[list[str]]:
+    def _build_order_rows(self, orders: list[dict[str, Any]]) -> list[list[str]]:
         """Build order table rows."""
         rows: list[list[str]] = []
         for row in orders:
             value = float(row.get("value") or 0.0)
             deadline = format_date(row.get("deadline"))
             customer = row.get("customer_display") or row.get("customer_name") or ""
-            rows.append([
-                str(row.get("order_no", "")),
-                str(row.get("title", "")),
-                str(customer),
-                str(deadline),
-                f"${value:,.2f}",
-                str(row.get("status", "")),
-            ])
+            rows.append(
+                [
+                    str(row.get("order_no", "")),
+                    str(row.get("title", "")),
+                    str(customer),
+                    str(deadline),
+                    f"${value:,.2f}",
+                    str(row.get("status", "")),
+                ]
+            )
         return rows or [["None", "", "", "", "", ""]]
 
     def _render_table(
@@ -259,16 +255,14 @@ class PdfService:
             cells = [str(cell) for cell in row]
             cell_lines = [
                 self._split_lines(pdf, width, text)
-                for width, text in zip(col_widths, cells)
+                for width, text in zip(col_widths, cells, strict=False)
             ]
             max_lines = max(len(lines) for lines in cell_lines)
             row_height = line_height * max_lines
-            self._ensure_page_space(
-                pdf, row_height, headers, col_widths, header_height
-            )
+            self._ensure_page_space(pdf, row_height, headers, col_widths, header_height)
             x = pdf.get_x()
             y = pdf.get_y()
-            for width, lines in zip(col_widths, cell_lines):
+            for width, lines in zip(col_widths, cell_lines, strict=False):
                 text = "\n".join(lines)
                 pdf.multi_cell(
                     width,

@@ -105,7 +105,9 @@ def _migrate_customers(conn: sqlite3.Connection) -> None:
         try:
             conn.execute(
                 """
-                INSERT INTO customers (name, contact_name, email, phone, notes, created_at, updated_at)
+                INSERT INTO customers (
+                    name, contact_name, email, phone, notes, created_at, updated_at
+                )
                 VALUES (?, '', '', '', '', ?, ?)
                 """,
                 (name, now, now),

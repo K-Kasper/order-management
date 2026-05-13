@@ -22,9 +22,7 @@ class LabeledEntry(ttk.Frame):
         super().__init__(parent)
         self._variable = variable
 
-        ttk.Label(self, text=label + ":", width=18, anchor="e").pack(
-            side="left", padx=(0, 3)
-        )
+        ttk.Label(self, text=label + ":", width=18, anchor="e").pack(side="left", padx=(0, 3))
         self._entry = ttk.Entry(self, textvariable=variable, width=width, state=state)
         self._entry.pack(side="left", **kwargs)
 
@@ -53,9 +51,7 @@ class LabeledCombobox(ttk.Frame):
         super().__init__(parent)
         self._variable = variable
 
-        ttk.Label(self, text=label + ":", width=18, anchor="e").pack(
-            side="left", padx=(0, 3)
-        )
+        ttk.Label(self, text=label + ":", width=18, anchor="e").pack(side="left", padx=(0, 3))
         self._combo = ttk.Combobox(
             self, textvariable=variable, values=values, width=width, state=state
         )
@@ -88,9 +84,7 @@ class LabeledDateEntry(ttk.Frame):
         super().__init__(parent)
         self._variable = variable
 
-        ttk.Label(self, text=label + ":", width=18, anchor="e").pack(
-            side="left", padx=(0, 3)
-        )
+        ttk.Label(self, text=label + ":", width=18, anchor="e").pack(side="left", padx=(0, 3))
         self._entry = DateEntry(
             self,
             textvariable=variable,

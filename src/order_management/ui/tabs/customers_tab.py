@@ -1,8 +1,9 @@
 """Customers tab controller."""
 
 import tkinter as tk
+from collections.abc import Callable
 from tkinter import messagebox, ttk
-from typing import Any, Callable
+from typing import Any
 
 from order_management.services.customer_service import CustomerService
 from order_management.ui.widgets import ButtonBar, clear_treeview
@@ -49,16 +50,12 @@ class CustomersTabController:
     def _build_customers_list(self, parent: ttk.Frame) -> None:
         """Build the customers list section."""
         list_frame = ttk.LabelFrame(parent, text="Customers")
-        list_frame.pack(
-            fill="both", expand=True, pady=(self._layout["section_padx"], 4)
-        )
+        list_frame.pack(fill="both", expand=True, pady=(self._layout["section_padx"], 4))
 
         columns = ("name", "contact_name", "email", "phone", "updated_at")
         tree_frame = ttk.Frame(list_frame)
         tree_frame.pack(fill="both", expand=True, padx=4, pady=4)
-        self._customers_tree = ttk.Treeview(
-            tree_frame, columns=columns, show="headings", height=8
-        )
+        self._customers_tree = ttk.Treeview(tree_frame, columns=columns, show="headings", height=8)
         headings = {
             "name": "Name",
             "contact_name": "Contact",

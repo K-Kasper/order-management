@@ -1,6 +1,6 @@
 """Version information for the application."""
 
-from importlib.metadata import version, PackageNotFoundError
+from importlib.metadata import PackageNotFoundError, version
 
 __all__ = ["get_version"]
 

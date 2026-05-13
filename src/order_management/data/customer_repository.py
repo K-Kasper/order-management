@@ -9,9 +9,7 @@ from order_management.data.db import get_connection
 class CustomerRepository:
     def list_customers(self) -> list[dict[str, Any]]:
         with get_connection() as conn:
-            rows = conn.execute(
-                "SELECT * FROM customers ORDER BY name COLLATE NOCASE"
-            ).fetchall()
+            rows = conn.execute("SELECT * FROM customers ORDER BY name COLLATE NOCASE").fetchall()
         return [dict(row) for row in rows]
 
     def get_customer(self, customer_id: int) -> dict[str, Any] | None:
