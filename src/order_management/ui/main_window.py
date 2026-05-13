@@ -8,7 +8,12 @@ from tkinter import messagebox, ttk
 from order_management.services.customer_service import CustomerService
 from order_management.services.order_service import OrderService
 from order_management.services.seed_service import SeedService
-from order_management.ui.constants import BG_MAIN, DEFAULT_LAYOUT, PRIMARY_BLUE
+from order_management.ui.constants import (
+    BG_MAIN,
+    DEFAULT_LAYOUT,
+    HEADER_FOREGROUND,
+    PRIMARY_BLUE,
+)
 from order_management.ui.tabs import (
     CustomersTabController,
     OrdersTabController,
@@ -60,7 +65,9 @@ class MainWindow(tk.Tk):
         style = ttk.Style(self)
         style.configure("Toolbar.TFrame", padding=(self._layout["panel_padx"], 4))
         style.configure("Header.TFrame", background=PRIMARY_BLUE)
-        style.configure("Header.TLabel", background=PRIMARY_BLUE, foreground="#ffffff")
+        style.configure(
+            "Header.TLabel", background=PRIMARY_BLUE, foreground=HEADER_FOREGROUND
+        )
         style.configure("Filter.TLabel", padding=(0, 0, 6, 0))
         style.configure("Action.TButton", padding=(8, 2))
 

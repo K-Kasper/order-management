@@ -13,7 +13,7 @@ from order_management.services.order_service import (
     OrderFilters,
     OrderService,
 )
-from order_management.ui.constants import IMAGE_FILE_TYPES
+from order_management.ui.constants import IMAGE_FILE_TYPES, PDF_FILE_TYPES
 from order_management.data.settings import get_setting, set_setting
 from order_management.ui.file_utils import open_folder, open_path
 from order_management.ui.widgets import ButtonBar, clear_treeview, configure_treeview_tags
@@ -648,7 +648,7 @@ class OrdersTabController:
             return
         chosen = filedialog.asksaveasfilename(
             defaultextension=".pdf",
-            filetypes=[("PDF files", "*.pdf")],
+            filetypes=PDF_FILE_TYPES,
             initialdir=self._default_export_dir(),
             initialfile=filename,
         )

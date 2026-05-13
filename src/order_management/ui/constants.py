@@ -3,6 +3,7 @@
 # Color scheme
 PRIMARY_BLUE = "#1F3A5F"
 BG_MAIN = "#c0c0c0"
+HEADER_FOREGROUND = "#ffffff"
 
 # Tag colors for treeview rows
 TAG_COLORS = {
@@ -24,4 +25,8 @@ DEFAULT_LAYOUT = {
 IMAGE_FILE_TYPES = [
     ("Images", "*.png *.jpg *.jpeg *.gif *.bmp"),
     ("All Files", "*.*"),
+]
+
+PDF_FILE_TYPES = [
+    ("PDF files", "*.pdf"),
 ]
