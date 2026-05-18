@@ -7,7 +7,7 @@ from datetime import date, datetime, timedelta
 from pathlib import Path
 from typing import Any
 
-from order_management.data.db import APP_DIR, init_db
+from order_management.data.db import APP_DIR
 from order_management.data.order_repository import OrderRepository
 from order_management.services.pdf_service import PdfService
 
@@ -32,7 +32,6 @@ class OrderService:
     """Service for order CRUD operations and exports."""
 
     def __init__(self) -> None:
-        init_db()
         self._repo = OrderRepository()
         self._pdf_service = PdfService()
 

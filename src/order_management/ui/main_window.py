@@ -5,7 +5,7 @@ import tkinter.font as tkfont
 from pathlib import Path
 from tkinter import messagebox, ttk
 
-from order_management.services.customer_service import CustomerService
+from order_management.data.customer_repository import CustomerRepository
 from order_management.services.order_service import OrderService
 from order_management.services.seed_service import SeedService
 from order_management.ui.constants import (
@@ -34,7 +34,7 @@ class MainWindow(tk.Tk):
         self.configure(bg=BG_MAIN)
 
         self._order_service = OrderService()
-        self._customer_service = CustomerService()
+        self._customer_repository = CustomerRepository()
         self._seed_service = SeedService()
 
         self._configure_style()
@@ -133,7 +133,7 @@ class MainWindow(tk.Tk):
         )
         self._customers_controller = CustomersTabController(
             customers_tab,
-            self._customer_service,
+            self._customer_repository,
             self._layout,
             self._set_status,
             self._on_customers_changed,

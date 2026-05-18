@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from datetime import date, timedelta
 
-from order_management.services.customer_service import CustomerService
+from order_management.data.customer_repository import CustomerRepository
 from order_management.services.order_service import (
     PRIORITY_OPTIONS,
     STATUS_OPTIONS,
@@ -19,7 +19,7 @@ class SeedResult:
 
 class SeedService:
     def __init__(self) -> None:
-        self._customers = CustomerService()
+        self._customers = CustomerRepository()
         self._orders = OrderService()
 
     def seed_demo_data(self) -> SeedResult:

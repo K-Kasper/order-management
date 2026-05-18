@@ -6,7 +6,7 @@ from collections.abc import Callable
 from tkinter import messagebox, ttk
 from typing import Any
 
-from order_management.services.customer_service import CustomerService
+from order_management.data.customer_repository import CustomerRepository
 from order_management.ui.widgets import ButtonBar, clear_treeview
 from order_management.utils import format_datetime
 
@@ -17,7 +17,7 @@ class CustomersTabController:
     def __init__(
         self,
         parent: ttk.Frame,
-        customer_service: CustomerService,
+        customer_repository: CustomerRepository,
         layout: dict[str, int],
         set_status: Callable[[str], None],
         on_data_changed: Callable[[], None],
@@ -26,12 +26,12 @@ class CustomersTabController:
 
         Args:
             parent: Parent frame for the tab.
-            customer_service: Customer service instance.
+            customer_repository: Customer repository instance.
             layout: Layout configuration dictionary.
             set_status: Callback to set status bar message.
             on_data_changed: Callback when customers are modified.
         """
-        self._customer_service = customer_service
+        self._customer_repository = customer_repository
         self._layout = layout
         self._set_status = set_status
         self._on_data_changed = on_data_changed
@@ -134,8 +134,8 @@ class CustomersTabController:
         actions.pack(fill="x", pady=(0, 6))
 
     def load_customers(self) -> None:
-        """Load customers from the service."""
-        self._customers_cache = self._customer_service.list_customers()
+        """Load customers from the repository."""
+        self._customers_cache = self._customer_repository.list_customers()
         self._customers_by_name = {
             customer.get("name", ""): int(customer["id"])
             for customer in self._customers_cache
@@ -170,7 +170,7 @@ class CustomersTabController:
         if not selection:
             return
         customer_id = int(selection[0])
-        customer = self._customer_service.get_customer(customer_id)
+        customer = self._customer_repository.get_customer(customer_id)
         if not customer:
             return
         self._current_customer_id = customer_id
@@ -199,11 +199,11 @@ class CustomersTabController:
             return
         try:
             if self._current_customer_id is None:
-                customer_id = self._customer_service.create_customer(payload)
+                customer_id = self._customer_repository.create_customer(payload)
                 self._current_customer_id = customer_id
                 self._set_status("Customer created")
             else:
-                self._customer_service.update_customer(self._current_customer_id, payload)
+                self._customer_repository.update_customer(self._current_customer_id, payload)
                 self._set_status("Customer updated")
         except sqlite3.IntegrityError as exc:
             self._handle_customer_integrity_error(payload["name"], exc)
@@ -243,10 +243,10 @@ class CustomersTabController:
             messagebox.showinfo("Delete Customer", "Select a customer to delete.")
             return
         customer_id = int(selection[0])
-        customer = self._customer_service.get_customer(customer_id)
+        customer = self._customer_repository.get_customer(customer_id)
         if not customer:
             return
-        linked = self._customer_service.count_linked_orders(customer_id)
+        linked = self._customer_repository.count_linked_orders(customer_id)
         if linked > 0:
             proceed = messagebox.askyesno(
                 "Delete Customer",
@@ -256,7 +256,7 @@ class CustomersTabController:
             )
             if not proceed:
                 return
-        self._customer_service.delete_customer(customer_id)
+        self._customer_repository.delete_customer(customer_id)
         self._current_customer_id = None
         self.new_customer()
         self.load_customers()
