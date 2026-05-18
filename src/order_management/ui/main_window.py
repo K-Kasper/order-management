@@ -226,7 +226,7 @@ class MainWindow(tk.Tk):
         self._orders_controller.delete_order()
 
     def _export_form(self) -> None:
-        self._orders_controller._export_form()
+        self._orders_controller.export_form()
 
     def _new_customer(self) -> None:
         self._notebook.select(1)

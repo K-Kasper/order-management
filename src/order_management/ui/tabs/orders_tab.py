@@ -279,7 +279,7 @@ class OrdersTabController:
                 ("New Order", self.new_order),
                 ("Save Order", self.save_order),
                 ("Delete Order", self.delete_order),
-                ("Export Form", self._export_form),
+                ("Export Form", self.export_form),
                 ("Add Image", self._add_images),
                 ("Remove Image", self._remove_image),
                 ("View Image", self._view_image),
@@ -629,7 +629,7 @@ class OrdersTabController:
             return str(downloads)
         return str(Path.home())
 
-    def _export_form(self) -> None:
+    def export_form(self) -> None:
         """Export the current order as PDF."""
         if self._current_order_id is None:
             messagebox.showinfo("Export", "Select an order to export.")
